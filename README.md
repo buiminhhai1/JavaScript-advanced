@@ -123,4 +123,5 @@ let psn = JSON.parse(jsonString); // Chuyển String thành Oject.
 console.log(psn.firstName); // Minh Hai
 console.log(psn.lastName); // Bui
 ```
-
+## II. This (trong JavaScript)???
+Khi mới học, ta thấy this cũng đơn giản và vô hai. Nếu như học qua C++, C# thì từ khóa this dùng để trỏ tới chính object gọi hàm đó. 

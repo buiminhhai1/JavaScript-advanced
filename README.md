@@ -248,3 +248,72 @@ let person = {
 let showNameFunc = person.showName.bind(person); // Gán function vào biến showNameFunc
 showNameFunc(); // Chạy đúng vì this bây giờ là object person, vì ta đã bind.
 ```
+
+## III. Prototype JavaScript là gì???
+  Khi một thằng developer khác cứ đi theo và hỏi bạn "Prototype là cái quái gì?", hãy trả lời nó: Là cái đầu "cha" mày, hỏi hỏi cl. Câu trả lời có thể hổ báo nhưng nó lại khá chính xác, có thể hiểu prototype nôm na là khuôn hoặc là "cha" của một object.
+
+  Trong JavaScript, trừ undefined, toàn bộ các kiểu còn lại đề là object. Các kiểu string, number, boolean, lần lượt là object dạng String, Number, Boolean. Mảng là object dạng Array, hàm là object dạng Function. Prototype của mỗi object chính là cha của nó, cha của String là String.prototype, cha của Number là Number.prototype, của Array là Array.prototype.
+  
+  Trong JavaScript, `Việc kế thừa được thực hiện thông qua prototype`. Khi ta gọi property hoặc function của một object, JavaScript sẽ tìm trong chính Object đó, nếu không có thì tìm lên cha của nó. Do đó, ta có thể gọi các hàm toUpperCase, trim trong String là do các hàm đó đã tồn tại trong String.prototype.
+
+Khi ta thêm function cho prototype, toàn bộ những thằng con của nó cũng học được function tương tự. Ví dụ 
+```python
+let str = "abc"; str là string, cha nó là String.
+
+// Nhân đôi chuỗi đưa vào
+String.prototype.duplicate = () => this + this;
+
+console.log(str.duplicate()); // Tìm thấy hàm duplicate trong prototype 
+// Kết quả là: abcabc
+```
+Như đã trình bày ở trên, Array, Number hay String có cha là Object, do đó chungs đều có các hàm như constructor, hasOwnProperty, toString thuộc về Object.prototype
+
+Nhắc lại một chút về Object. Ta có 2 cách để khởi tạo object, đó là sử dụng object literal và Constructor Function. Nếu dùng Object literal, object được tạo ra sẽ có prototype là Object.prototype. Nếu dùng constructor function, object sẽ có một prototype mới, prototype này kế thừa Object.prototype.
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui"
+  showName: () => console.log(this.firstName + "  " + this.lastName)
+}; // Object này có prototype là Object.prototype
+
+function Person(firstName, lastName) {
+  this.firstName = firstName;
+  this.lastName = lastName;
+  this.showName = () => console.log(this.firstName + " " + this.lastName);
+}
+let otherPerson = new Person("Hang", "Pham"); // Object này có prototype là Person.prototype
+// Prototype mới: Person.prototype được tạo ra.
+// Person.prototype kế thừa từ Object.prototype.
+```
+Những object được tạo ra bằng cách gọi new Person() đều có prototype là Person.prototype. Nếu muốn thêm trường hay hàm cho các object này, chỉ cần thêm 1 lần vào prototype là xong. Hiểu nôm na thì prototype cũng có vài phần giống với class.
+```python
+ function Person (firstName, lastName){
+  this.firstName = firstName;
+  this.lastName = lastName;
+ }
+ Person.prototype.love = () => console.log("love light");
+ 
+ let otherPerson = new Person("Minh Hai", "Bui");
+ otherPerson.love(); // love light
+ ```
+ ### Prototype dùng để làm gì??? what's up man?
+ Trong JavaScript không có khái niệm class, do vây, để kế thừa các trường/hàm của một object, ta phải sử dùng prototype.
+ ```python
+ function Person(){
+  this.firstName = "Per";
+  this.lastName ="son";
+  this.sayName = () => this.firstName + " " +this.lastName
+ }
+ // Viết một Constructor Function khác
+ function SuperMan(firstName, lastName){
+  this.firstName = firstName;
+  this.lastName = lastName;
+ }
+ 
+ // Ta muốn SuperMan sẽ kế thừa các thuộc tính của Person
+ // Sử dụng Prototype để kế thừa.
+ SuperMan.prototype = new Person();
+ // Tạo một object mới bằng Construtor Function
+ let sm = new SuperMan("Minh Hai", "Bui");
+ sm.sayName(); // Minh Hai Bui. Hàm này kế thừa từ prototype của Person
+ ```

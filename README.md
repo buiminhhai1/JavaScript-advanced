@@ -124,4 +124,64 @@ console.log(psn.firstName); // Minh Hai
 console.log(psn.lastName); // Bui
 ```
 ## II. This (trong JavaScript)???
-Khi mới học, ta thấy this cũng đơn giản và vô hai. Nếu như học qua C++, C# thì từ khóa this dùng để trỏ tới chính object gọi hàm đó. 
+Khi mới học, ta thấy this cũng đơn giản và vô hai. Nếu như học qua C++, C# thì từ khóa this dùng để trỏ tới chính object gọi hàm đó. Trong JavaScript this cũng có vai trò tương tự. 
+Ví dụ: this trong đoạn code dưới đây trỏ tới object person. -> in ra những gì mình muốn.
+```python
+let person ={
+  firstName: "Minh Hai",
+  lastName: "Bui",,
+  showName: () => console.log(this.firstName + "  " + this.lastName)
+}
+// Ở đây this sẽ là object person
+person.showName(); // Minh Hai Bui
+```
+Một trường hợp khác, khi ta khai báo biến global và hàm global, toàn bộ các biến và hàm đó sẽ nằm trong một object có tên là _window_. Lúc này, khi ta gọi hàm showName, chính object _window_ là object gọi hàm đó, this trỏ tới chính object _window_.
+```python
+let firstName = "Minh Hai", lastName = "Bui";
+// 2 biến này nằm trong object window
+function showName(){
+  console.log(this.firstName + " " + this.lastName);
+}
+
+window.showName(); // Minh Hai Bui. this trỏ tới object window.
+showName(); // Minh Hai Bui. Object gọi hàm showName vẫn là object window.
+```
+#### This gây ra bao rắc rối ??? Really maker? 
+Nếu chỉ sử dụng t hoe 2 cách nêu trên, this sẽ khá dễ hiểu và không gây ra mấy khó khăn khi sử dụng. Song, sự đán sợ và khó chịu của this sẽ lộ dần ra qua các ví dụ dưới đây.
+##### First Blood. Hàm được truyền vào như một callback. (Chưa hiểu callback thì chịu khó Ctrl + F gõ callback để tìm thông tin ở dưới nhé).
+Giả sử, ta muốn khi người dùng clik vào một button, ta sẽ gọi hàm showName của user. Vô cùng đơn giản, ta chỉ cần truyền hàm showName vào như một _callback_ cho hàm click là xong. 
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui"
+  showName: () => console.log(this.firstName + " " + this.lastName)
+}
+
+// Ở đây this sẽ là object person
+person.showName(); // Minh Hai Bui
+
+// Đây là code jqurey
+$('button').click(person.showName); // showName truyền vào như callback
+```
+Tuy nhiên, hàm lại không chạy như ta mong muốn. Tại vì lúc này this chính là button mà ta đã click vào, chứ không còn là object person như ví dụ trên nữa.
+
+Trong trường hợp này, ta có thể sửa lỗi bằng cách sử dụng anonymous function, hoặc dùng hàm bind để xác định tham số this cho hàm truyền vào là được.
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui",
+  showName: () => console.log(this.firstName + " " + this.lastName)
+};
+
+$('button').click(person.showName); // showName truyền vào callback, ở đây this chính là button
+
+// dùng anonymous function
+$('button').click(function() {person.showName();});
+// Có thể viết lại theo arrow
+$('button').click(() => person.showName());
+
+// Dùng bind
+$('button').click(person.showName.bind(person)); // This ở đây vẫn là object person
+
+
+```

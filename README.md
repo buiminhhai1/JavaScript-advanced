@@ -182,6 +182,69 @@ $('button').click(() => person.showName());
 
 // Dùng bind
 $('button').click(person.showName.bind(person)); // This ở đây vẫn là object person
+```
+##### Rắc rối 2 - Sử dụng this trong anonymous function
+Giả sử, object person có một danh sách bạn bè, bạn muốn viết một function show toàn bộ bạn bè của person đó. Theo lý thuyết ta viết như sau: 
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui",
+  friends: ["Minh", "Sang", "Khoa", "Hoang"],
+  showFriend: () => {
+    for(let i = 0; this.friends.length ; i++){
+      console.log(this.firstName + " hava a friend " + this.friends[i]);
+    }
+  },
+  
+  showFriendThis: () => {
+    this.friends.forEach((fr) => console.log(this.firstName + " hava a friend " + fr)
+  }
+}
+person.showFriend(); // Hàm chạy đúng
 
+person.showFriendThis(); // Hàm chạy sai.
+```
 
+Với hàm showFriend, khi ta dùng hàm for thường, hàm chạy đúng như mong muốn. Tuy nhiên, trong trường hợp dưới, khi ta dùng forEach, truyền vào một anonymous function, this ở đây lại thành object _window_, do đó trường firstName bị underfined.
+
+Trong trường hợp này, cách giải quyết ta thường dùng là tạo một biến để gán giá trị this vào và truy xuất tói giá trị đó trong anonymous function 
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui",
+  friends: ["Minh", "Sang", "Khoa", "Hoang"],
+  showFriendFixed: () => {
+    let personObj = this; // Gán giá trị this vào biến personObj
+    this.friends.forEach((fr) => console.log(personObj.firstName + " hava a friend " + fr)
+  }
+};
+
+person.showFriendFixed();  // Hàm chạy đúng.
+```
+##### Rắc rối 3 - Khi hàm được gán vào một biến
+Trường hợp này ít xảy ra. Đó là trường hợp khi ta gán một hàm vào một biến, sau đó gọi hàm đó. Hàm sẽ không chạy như ta mong muốn, vì object gọi hàm lúc này chính là object _window_.
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui",
+  showName: () => console.log(this.firstName + " " + this.lastName)
+};
+
+// Ở đây this sẽ là object person, chạy đúng
+person.showName();
+
+let showNamefunc = person.showName; // Gán function vào biến showNamefunc
+showNamefunc(); // Chạy ra, ở đây this sẽ là object window
+```
+Để giải quyết, ta cũng sử dụng hàm bind như trường hợp trên cùng, quá đơn giản phải không man? 
+let's to the code following.
+```python
+let person = {
+  firstName: "Minh Hai", 
+  lastName: "Bui",
+  showName: () => console.log(this.firstName + " " + this.lastName)
+};
+
+let showNameFunc = person.showName.bind(person); // Gán function vào biến showNameFunc
+showNameFunc(); // Chạy đúng vì this bây giờ là object person, vì ta đã bind.
 ```

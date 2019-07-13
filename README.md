@@ -418,4 +418,56 @@ public class Person{
   let sm = new SuperMan("Minh Hai", "Bui");
   sm.sayName(); // Minh Hai Bui. Hàm này kế thừa từ prototype của Person.
   ```
+ ## V. JavaScript tào lao - BIND, CALL và APPLY
+  Bộ 3 function bind, call, apply. Đây là 3 hàm tạo nên sự mạnh mẽ và bá đạo của JavaScript.
+  #### Trói this lại bằng bind.
+ Bind là mọt hàm nằm trong Function.prototype, d đó chỉ có function mới có khả năng gọi nó. bind được dùng để xác định tham số _this_ cho một function.
+ Như trong trường hợp dưới đây, khi ta truyền hàm showName vào như một -callback- cho hàm button.click, giá trị this ở đây chính là button đó. Để hàm chạy đúng, ta dùng _bind_ để bind giá trị person và this.
+ ```python
+ let person = {
+  firsName: "Minh Hai",
+  lastName: "Bui",
+  showName: () => console.log(this.firstName + "  " + this.lastName)
+ };
  
+ //showName truyền vào như callback, ở đây this là button
+ $('button').click(person.showName);
+ 
+ // Dùng bind để xác định giá trị this
+ $('button').click(person.showName.bind(person)); // This ở đây vẫn là objet person.
+ ```
+Không chỉ bind được giá trị this, _bind_ còn bind được các tham số truyền vào cho hàm nữa. Do đó, Bind còn được dùng để viết partial function.
+
+Nói một cách đơn giản, partial function tức là tạo ra 1 function mói từ 1 function cũ bằng cách gán mặc định một số tham số cho function cũ đó. Ví dụ. một hàm _log_ đơn giản có 3 tham số
+```python
+function log(level, time, message){
+  console.log(level + " - " + time +" - "  + message);
+}
+```
+Giả sử muốn tạo một hàm log khác, ghi lại các log error của hôm này, chúng ta có thể viết một hàm mói dựa theo hàm log cũ: 
+
+```python
+function log(level, time, message){
+  console.log(level + " - " + time + " - " + messsage);
+}
+
+function logErrToday(message){
+  log("Error", "Today", message);
+}
+
+logErrToday("Server die."); // Error - Today - Server die
+```
+Thay vì viết như thế, mình có thể viết đơn giản hơn bằng cách dùng _bind_. Ở đây _log_ là function cũ, _logErrToday_ là function mới, được tạo ra bằng cách gán mặc định 2 tham số level và time.
+```python
+function log(level, time, message){
+  console.log(level + " - " + time + ": " + message);
+}
+
+// Không có this nên set this là null.
+// Set mặc định 2 tham số level và time 
+let logErrToday = log.bind(null, "Error", "Today");
+
+// Hàm này tương ứng với log("Error", "Today", "Server die.")
+logErrToday("Server die.");
+// result: Error - Today: Server die.
+```

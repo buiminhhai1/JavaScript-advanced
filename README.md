@@ -471,3 +471,9 @@ let logErrToday = log.bind(null, "Error", "Today");
 logErrToday("Server die.");
 // result: Error - Today: Server die.
 ```
+  #### Call và Apply, tuy 2 mà 1, thấy 1 mà 2
+  Hai hàm này nằm trong prototype của Function (Function.prototype), do đó chỉ function mới có thể gọi. Chúng có chung một chức năng lại: Gọi 1 function, xác  định tham số this, truyền các tham số còn lại.
+  
+  Điểm khác nhau là _apply_ truyền vào một array chứa toàn bộ các tham số, còn _call_ truyền lần lượt từng tham số.
+  Để dễ nhớ: "A là một Array, C là nhiều Cục"
+  

@@ -317,3 +317,105 @@ Những object được tạo ra bằng cách gọi new Person() đều có prot
  let sm = new SuperMan("Minh Hai", "Bui");
  sm.sayName(); // Minh Hai Bui. Hàm này kế thừa từ prototype của Person
  ```
+ 
+ ### IV. OOP Trong JavaScript.
+ Các đặc tính của OOP trong JavaScript. 
+ - Encapsulation: Tính bao đóng và che giấu thông tin. Tính chất này không cho phép người dùng sử dụng các đối tượng thay đổi trạng thái nội tại của một đối tượng. Chỉ có các phương thức nội tại của đối tượng cho phép thay đổi trạng thái của nó. Việc cho phép bên ngoài tác động lên các dữ liệu nội tại của một đối tượng tùy thuộc vào người viết mã. Đây là tính chất đảm bảo sự toàn vẹn của đối tượng.
+ 
+ - Inheritance: Tính kế thừa. Đặc tính này cho phép một đối tượng có thể có sẵn các đặc tính mà đối tượng khác đã có thông qua kế thừa. Điều này cho phép các đối tượng chia sẻ hay mở rộng các đặc tính có sẵn mà không phải tiến hành định nghĩa lại. Tuy nhiên, không phải ngôn ngữ hướng đối tượng nào cũng có tính chất này. 
+ 
+ - Polymophism: Tính đa hình. Thể hiện thông qua việc gửi các thông điệp ( message). Việc gửi các thông điệp này có thể so sánh như việc gọi các hàm bên trong của một đối tượng. Các phương thức dùng trả lời cho một thông điệp sẽ tùy theo đối tượng mà thông điệp sẽ tùy theo đối tượng mà thông điệp đó được gửi đến có phản ứng khác nhau. Người lập trình có thể định nghĩa một đặc tính (chẳng hạn thông qua tên của các phương thức) cho một loạt các đối tượng gần nhau nhưng khi thi hành thì dùng cùng một tên gọi mà sự thi hành của mỗi đối tượng sẽ tự động xảy ra tương ứng theo đặc tính của từng đối tượng mà không bị nhầm lẫn.
+#### OOP trong Java
+Java là một ngôn ngữ hướng đối tượng, do đó việc thực hiện các đặc tính OOP rất đơn giản và nhanh gọn, dễ hiểu. 
+
+ a. Tính đóng gói trong Java thể hiện bằng cách cho khai báo các trường private, chỉ có thể truy xuất thông qua các hàm set, get.
+ ```python
+ public class Person{
+  private String firstName; 
+  private String lastName;
+  private int age;
+  
+  public String getFristName() {return this.firstName;}
+  public void setFirstName(String firstName) {this.firstName = firstName;}
+  
+  public String getLastName() {return this.lastName;}
+  public void setLastName(String lastName){this.lastName = lastName;}
+  
+  public int getAge() {return age;}
+  public void setAge(age) {this.age = age;}
+ }
+ ```
+Tính kế thừa và đa hình cũng khá đơn giản, chỉ cần extend và viết hàm mới đè lên là xong.
+```python
+public class Person{
+  private int personSecret; // Chỉ person mới truy xuất được.
+  protected int age; // superman có thể truy xuất được.
+  
+  public void say(String message){
+    System.out.println("Person said " + message);
+  }
+  
+  // Kế thừa và override hàm say
+  public class Superman extends Person{
+    public void say(String message){
+      System.out.println("Superman said " + message);
+    }
+  }
+}
+```
+### OOP trong JavaScript
+ Trong JavaScript để thực hiện tính đóng gói, ta có thể tạo ra 1 constructor function, đóng gói toàn bộ các trường và hàm vào một object. Thông thường chúng ta hay làm như sau:
+ ```python
+ function Person(firstName, lastName) {
+  this.fristName = firstName; 
+  this.lastName = lastName;
+  this.showName = () => console.log(this.firstName + " "  +this.lastName)
+ };
+ 
+ let psn1 = new Person("Minh Hai", "Bui");
+ // Các property khai báo vào biến this có thể truy xuất từ bên ngoài
+ // Object không còn tính bao đóng nữa.
+ psn1.firstName = "changed";
+ console.log(psn1.firstName);
+ ```
+ Với các khai báo này, tính bao đóng không được đảm bảo. Các property có thể bị truy cập, thay đổi từ bên ngoài. Ở đây, ta phải sử dụng biến cục bộ.
+ ```python
+ function Person(firstName, lastName){
+  let fstName = firstName;
+  let lstName = lastName;
+  
+  this.setFirstName = (firstName) => fstName = firstName;
+  this.setLastName = (lastName) => lstName = lastName;
+  
+  this.getFirstName = () => fstName;
+  this.getLastName = () => lstName;
+ }
+ 
+ let psn1 = new Person("Minh Hai", "Bui");
+ console.log(psn1.fstName); // Undefined, Không thể truy cập được
+ console.log(psn1.getFirstName); // Minh Hai
+ ```
+  Tuy nhiên, biến cục bộ này chỉ có thể truy xuất trong Constructor Function, nó tương đương với các trường private trong java. Trong JavaScript, không có cách nào để tạo ra các trường protected (Chỉ có thể truy cập từ class kế thừa) như Java và C# được. Việc kế thừa còn tào lao hơn nữa, vì JavaScript không có từ khóa extends cũng như class, ta phải sử dụng prototype để kế thừa.
+  Ví dụ:
+  ```python
+  function Person() {
+    this.firstName = "Per";
+    this.lastName = "son";
+    this.sayName = () => this.firstName + " " + this.lastName;
+  }
+  
+  // Viết một constructor Function khác.
+  function SuperMan(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+  
+  // Ta muốn SuperMan sẽ kế thừa các thuộc tính của Person
+  // Sử dụng prototype để kế thừa.
+  SuperMan.prototype = new Person();
+  
+  // Tạo ra một object mới bằng constructor function
+  let sm = new SuperMan("Minh Hai", "Bui");
+  sm.sayName(); // Minh Hai Bui. Hàm này kế thừa từ prototype của Person.
+  ```
+ 

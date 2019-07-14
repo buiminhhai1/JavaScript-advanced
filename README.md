@@ -476,4 +476,57 @@ logErrToday("Server die.");
   
   Điểm khác nhau là _apply_ truyền vào một array chứa toàn bộ các tham số, còn _call_ truyền lần lượt từng tham số.
   Để dễ nhớ: "A là một Array, C là nhiều Cục"
-  
+  Ví dụ đơn giản về call và apply: 
+  ```python
+    // Tim max bằng cách gọi Math.max
+    Math.max(4,3,2,10);
+    
+    // Thay vì gọi trực tiếp hàm Math.max, ta có thể dùng call
+    // Set this bằng null
+    Math.max.call(null, 4,3,2,10);
+    
+    // Apply tương tự call, nhưng không truyền lần lượt.
+    Math.max.apply(null, [4, 3, 2, 10]);
+  ```
+ _call_ và _apply_ thường được dùng để mượn hàm (borrowing function).
+ ```python
+ function test(firstParam, secondParam, thirdParam){
+  let args = Array.apply(null, arguments);
+  console.log(args);
+ }
+ 
+ test(1, 2, 3); // [1, 2, 3]
+ ```
+ 
+ Luư ý arguments là một biến cục bộ trong function, chứa toàn bộ các tham số được truyền vào. arguments là một object giống array nhưng không phải Array. arguments giống Array vì có field length, có thể truy cập các giá trị nó chứa thông qua index 0, 1, 2. Tuy nhiên, do arguments không phải là Array nên nó không thể gọi các hàm của Array.prototype..
+ Do đó, ta phải sử dụng call/ apply để mượn một số hàm trong Array.prototype, các hàm này sẽ trả ra một array cho ta xử lý. Dòng code phía trên chuyển object arguments thành một array.
+ 
+ Ngoài ra, _call_ và _apply_ còn được dùng để monkey-patching hoặc tạo spy. Ta có thể mở rộng chức năng của một hàm mà không cần sửa source code của hàm fđó. Ví dụ ta có hàm accessWeb của object computer.
+ ```python
+let computer = {
+  accessWeb: (site) => console.log("Go to: " + site);
+};
+
+computer.accessWeb("google.com"); // Go to google.com
+ ```
+  Sử dụng call, ta có thể ghi thêm log trước và sau khi hàm accessWeb được gọi mà không can thiệt vào code của hàm đó.
+```python
+let computer = {
+  accessWeb: (site) => console.log("Go to: " + site)
+};
+
+let oldFunction = computer.accessWeb;
+// Tráo function accessWeb bằng hàm mới.
+computer.accessWeb = () => {
+  console.log("Con gà bắt đầu vào web");
+  oldFunction.apply(this,arguments); // Giữ nguyên hàm cũ.
+  console.log("Con gà đã vào web");
+}
+
+computer.accessWeb("google.com");
+// Con gà bắt đầu vào web
+// Go to: google.com 
+// Con gà đã vào web
+```
+Call/Apply và _bind_ cũng ít người rành, đọc xong có thể lòe thiên hạ.
+Do ít người rành nên dùng nó khi viết code phải chú thích vào.

@@ -689,3 +689,174 @@ m.get(s) === 34;
 
 ###7. Promise
 Promise là một khái niệm hay, giúp cho việc code asynchonous (bất đồng bộ) dễ dàng hơn. Promise được sử dụng trong rất nhiều thư viện như JQuery, AngularJS.
+
+## Promise??? 
+### Promise được dùng khá nhiều ở cả front end và back-end(Nodejs), do đó phải nắm vững khái niệm này sẽ giúp bạn rất nhiều trong việc code và trả lời phỏng vấn.
+
+### Lập trình bất đồng bộ trong JavaScript
+Ai từng làm AjAX đều biết rằng JavaScript kết nối theo server theo cơ chế bất đồng bộ, các hàm phía sau không đợi hàm AJAX chạy xong mà tiếp tục chạy luôn.
+```python
+  let thuHang = ajax.get("thuHangdethuong.img");
+  console.log(thuHang);
+  // Hàm AJAX chạy bất đồng bộ, do đó giá tri thuHang là undefined.
+```
+Do đó, để lấy kết quả của hàm ajax, ta phải truyền cho nó một callback. Sau khi hàm AJAX lấy được kết quả, nó sẽ gọi hàm callback vói kết quả thu được.
+```python
+let callback = (image) => console.log(image);
+ajax.get("thuhang", callback);
+
+// Có thể viết ngắn gọn như sau
+ajax.get("thu-hang-de-thuong", (image) => console.log(image));
+```
+Cách làm này có gì không ổn? Sử dụng callback chồng chéo sẽ làm code trở nên rối rắm, khó đọc. Việc bắt exception, hiển thị lỗi cũng trở nên phức tạp.
+```python
+// do những hàm dưới chạy bất đồng bộ, bạ không thể lấy dữ liệu kiểu lần lượt kiểu này
+let xe = xin_me_mua_xe();   // Chờ cả năm mới có xe
+let gai = cho_gai_di_choi(xe);  // Lấy xe chở gái đi chơi
+let abcd = cho_gai_vao_hotel(y);  // Đi chơi chở gái đi đâu đó
+
+// Mà phải sử dùng đống callback  này, tạo thành callback HEO (hell)
+xin_me_mua_xe(
+  (xe) => {
+    cho_gai_di_choi((xe,gai)=>{
+      cho_gai_vao_hotel((hotel, z) =>{
+        //do something
+      });
+    });
+  }
+);
+```
+
+### Promise là gì???
+The promise object is used for asynchronous computations. A promise represents an operator that hasn't completed yet, but is expected in the future.
+Đại loại là Promise dùng cho tính toán xử lý bất đồng bộ. Một lời hứa đại diện cho một hoạt động chưa hoàn thành, nhưng dự kiến sẽ hoàn thành trong tương lai.
+
+Để đễ hiểu, hãy gọi Promise là lời hứa. Tương tự như trong thực tế, có người hứa rồi làm, có người hứa rồi... thất hứa.
+
+Một lời hứa có 3 trạng thái sau:
+- pending: Hiện lời hứa chỉ là lời hứa suông, còn đang chờ người khác thực hiện.
+- fulfilled: Lời hứa đã được thực hiện.
+- reject: Bạn đã bị thất hứa, hay còn gọi là bị "xù"
+
+Ví dụ: Khi xưa, để dụ bạn cố gắng học hành, bố mẹ bảo: "Ráng đậu đại học, bố mẹ sẽ mua cho con BMW đi học cho bằng bạn bằng bè". Lúc này, thứ bạn nhận được là một lời hứa, chứ không phải là BMW.
+```python
+function hứa_cho_có(){
+  return Promise((thuc_hien_loi_hua, that_hua) =>{
+    // Sau 1 thời gian dài oi là dài dài và daifiiiiiiiiiiiiiiiii.
+    // Nếu bố mẹ vui sẽ thực hiện lời hứa.
+    if(vui){
+      thuc_hien_loi_hua("Xe BMW");
+      // Lúc này trạng thái lời hứa là fulfilled.
+    } else {
+      that_hua("xe dap");
+      // Lúc này trạng thái của lời hứa là rejected.
+    }
+  });
+}
+
+// Lời hứa bây giờ đang là penđing
+// Nếu được thực hiện, bạn có "Xe BMW"
+// Nếu bị reject, bạn có "Xe Đạp"
+let promise = hứa_cho_có();
+promise
+  .then((xe_bmw) = > {
+    console.log("Được chiếc BMW vui quá");
+  })
+  .catch((xe_dap) =>{
+    console.log("Được chiếc xe đạp ...");
+  });
+```
+
+Khi lời hứa được thực hiện, promise sẽ gọi callback trong hàm then. Ngược lại, khi bị thất hứa, promise sẽ gọi callback trong hàm catch.
+Một ví dụ khác
+```python
+function get(url){
+  return new Promise((resolve, reject) => {
+    // Lấy tiền từ money.com
+    // Nếu bị lỗi thì đành thất hứa
+    if(error) reject("Error");
+    // Nếu lấy được thì thực hiện lời hứa
+    resolve(money);
+  });
+}
+
+let promise = ajax.get("money.com");
+
+// Có tiền thì mua mac không có tiền thì thôi.
+promise
+  .then(money => mac)
+  .catch(error => alert(error));
+```
+### Uả, cũng là dùng callback thôi ???
+Promise hay ở những điểm sau: 
+1. Promise sẽ hỗ trọ "Chaining"
+2. Promise sẽ giúp bắt lỗi dễ dàng hơn.
+3. Xử lý bất đồng bộ 
+
+###1. Promise chaining
+Giá trị trả về của hàm then là 1 promise khác. Do đó ta có thể dùng promise gọi liên tiếp các hàm bất đồng bộ. Có thể viết lại callback hell ở trên như sau:
+```python
+// dùng callback heo 
+xin_me_mua_xe((xe) => {
+    cho_gai_di_choi((xe,gai)=>{
+      cho_gai_vao_hotel((hotel, z) =>{
+        //do something
+      });
+    });
+  }
+);
+
+// Dùng promise, code gọn nhẹ dễ đọc
+xin_me_mua_xe
+  .then(cho_gai_di_choi)
+  .then(cho_gai_vao_hotel)
+  .then(() => { Do something });
+```
+###2. Bắt lỗi với promise
+Trong ví dụ trên, ta gọi lần lượt 3 hàm:
+xin_me_mua_xe, cho_gai_di_choi, cho_gai_vao_hotel
+
+Chỉ cần 1 trong 3 hàm này bị lỗi, promise sẽ chuyển qua trạng thái reject. Lúc này callback trong hàm catch sẽ được gọi. Việc bắt lỗi trở nên dễ dàng rất nhiều.
+
+```python
+function cho_gai_vao_hotel() => {
+  return new Promise((response, reject) => {
+    reject("xin lỗi hôm nay em đèn đỏ");
+  }); 
+}
+xin_me_mua_xe
+  .then(cho_gai_di_choi)
+  .then(cho_gai_vao_hotel)
+  .then(() => { // do something })
+  .catch(err => {
+    console.log(err); // Xin lỗi hôm nay em đèn đỏ
+    console.log("xui vl");
+  });
+```
+
+###3. Xử lý bất đồng bộ
+Giả sử bạn muốn 3 hàm AJAX khác nhau. Bạn cần kết quả trả về của 3 hàm này trước khi tiếp tục chạy. Với callback, việc này sẽ khó thực hiện. Tuy nhiên, promise hỗ trợ hàm Promise.all, cho phép gộp kết quả của nhiều promise lại vói nhau.
+```python
+// Ba hàm này phải được thực hiện "cùng lúc"
+// Chứ không phải là lần lượt.
+
+let sờ_trên = new Promise((resolve, reject) => {
+  resolve("Phê trên");
+});
+
+let sờ_dưới = new Promise((resolve, reject) => {
+  resolve("Phê dưới");
+});
+
+let sờ_tùm_lum = new Promise((resolve, reject) => {
+  resolve("Phê tùm lum");
+});
+
+// Truyền 1 array chứa toàn bộ promise vào hàm Promise.all
+// Hàm này trả ra 1 promise, tổng hợp kết quả của các promise đưa vào
+Promise.all([sờ_trên, sờ_dưới, sờ_tùm_lum])
+  .then((result) =>
+    console.log(result)); // ["Phê trên", "Phê dưới", "Phê tùm lum"]
+```
+
+

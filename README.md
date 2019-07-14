@@ -530,3 +530,162 @@ computer.accessWeb("google.com");
 ```
 Call/Apply và _bind_ cũng ít người rành, đọc xong có thể lòe thiên hạ.
 Do ít người rành nên dùng nó khi viết code phải chú thích vào.
+
+##VI ES6 JavaScript
+ES6 là chuẩn mới của JavaScript, cung cấp một số tính năng mới cho JavaScript, đồng thời giúp code tường minh và dễ viết hơn.
+
+###1. Arrow (Lambda Expression)
+  Ở ES6, thay vì khai báo function theo kiểu thông thường ,ta có thể sử dụng =>. Cách khai báo này tương tự như Lambda Expression trong C#, giúp cho code tường minh và ngắn hơn rất nhiều.
+```python
+let numbers= [1,2,3,4,5,6,7,8,9,10];
+// Giả sử ta muốn tìm số chẵn
+// Cách viết cũ
+let odd = numbers.filter(function(n) { return n% 2 == 1});
+console.log(odd);
+
+// Với arrow
+odd = numbers.filter(n => n%2 ==1);
+console.log(odd);
+```
+  Ngoài ra, nhờ có arrow, ta không còn bị tình trạng this bị bind nhầm
+```python
+let person = {
+  firstName: "Minh Hai",
+  lastName: "Bui",
+  friends: ["Minh", "Sang", "khoa", "Hoang"],
+  showName: function() {
+    this.friends.forEach((fr) {
+      // với cách viết cũ, this ở đây sẽ là object window, không phải là person
+      console.log(this.firstName + " hava a friend " + fr);
+    });
+  }
+  // ta sử dụng arrow, this vẫn là object person
+  this.friends.forEach(fr => console.log(this.fristName + " have a friend " + fr));
+}
+```
+
+###2. Default parameter, destructuring, spread operator
+  Default paremeter đã có từ lâu trong C, C++ , C#, giờ JavaScript cũng đã có... Java thì vẫn chưa có. Nhờ default parameter, ta có thể xác định giá trị mặc định của tham số truyền vào.
+```python
+// Cách cũ, phải check htam só truyền vào rồi xác định giá trị
+function multiply(a,b){
+  let b  = typeof b !== 'undefined' ?  b : 1;
+  return a*b;
+}
+
+// Với ES6, chỉ cần sử dụng dấu = 
+function multiply(a,b = 1){
+  return a*b;
+}
+multiply(5); // 5
+```
+
+Destructuring cũng là một tính năng khá hay, nó cho phép ta "phân rã" các phần tử trong một array hoặc 1 object
+```python
+// Với array
+let foo =["one", "two", "three"];
+
+// Cách cũ
+let one = foo[0];
+let two = foo[1];
+let three = foo[2];
+// Cách mới [one,two,three] = foo;
+
+// với object
+let obj = {
+  firstName:"Minh Hai", 
+  lastName: "Bui"
+};
+// Cách cũ
+let firstName = obj.firstName;
+let lastName = object.lastName;
+// dùng destructuring
+let {firstName, lastName} = obj;
+// Nếu muốn lấy tên biến khác tên field của object
+let {
+  firstName: fn,
+  lastName:ln
+} = obj;
+// fn: Minh Hai, ln = Bui
+```
+###3. Cải tiến syntax class và object
+Trong ES6, đã có class.
+class có hỗ trợ constructor, get/ set, việc kế thừa cũng rất dễ thực hiện bằng từ khóa extends
+```python
+class Animal {
+  construcotr(name){
+    this.name = name;
+  }
+  
+  speak(){
+    console.log(this.name + " makes a noise.");
+  }
+}
+
+class Dog extends Animal{
+  speak(){
+    console.log(this.name +" barks.");
+  }
+}
+```
+  Với cách khai báo object mới, ta có thể viết code một cách ngắn gọn và rõ ràng hơn nhiều.
+```python
+let firstName = "Minh Hai";
+let lastName ="Bui";
+// Khai báo object cũ
+let obj = {
+  firstName: firstName,
+  lastName: lastName,
+  showName() {console.log(this.firstName + " " + this.lastName)
+};
+// Khai báo kiểu mới, ngắn gọn hơn, 
+// Không cần lặt lại tên biến hay function
+var obj = {
+  firstName, 
+  lastName,
+  showName() {console.log(this.firstName + " " + this.lastName);}
+};
+```
+###4. Iterator 
+for...of để duyệt từng phần tử trong mảng (đừng nhần lẫn với for...in để duyệt các trường trong 1 object nha)
+```python
+let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// Cách cũ, duyệt từ đầu
+for(let i = 0; i<numbers.length; i++){
+  console.log(numbers[i]);
+}
+
+// Dùng forEach 
+numbers.forEach((number) => console.log(number);
+
+// Dùng for... of, để dễ viết dễ đọc
+for(var number of numbers) console.log(number);
+```
+###5. Template String
+JavaScript không có string.format, do đó phải cộng chuỗi bằng tai rất cực. Giờ đây, sử dụng template, string, ta không cần phải mất công cộng chuỗi nữa, code rõ ràng hơn nhiều.
+```python
+let name ="Bob";
+let time = "today";
+// Cách cũ
+console.log("Hello " + name + " how are you + " time" + "?");
+// Dùng string interpolation,
+console.log(`Hello ${name}, how are you ${time}`);
+```
+###6. Map and Set
+Map là cấu trúc dữ liệu cho phép ta lưu dữ liệu dưới dạng key-value, set là một mảng mà trong đó không có phần tử nào trùng nhau.
+```python
+// Sets
+let s  = new Set();
+s.add("hello").add("goodbye").add("hello");
+s.size === 2;
+s.has("hello) === true;
+
+// Maps
+let m = new Map();
+m.set("hello",42);
+m.set(s,34);
+m.get(s) === 34;
+```
+
+###7. Promise
+Promise là một khái niệm hay, giúp cho việc code asynchonous (bất đồng bộ) dễ dàng hơn. Promise được sử dụng trong rất nhiều thư viện như JQuery, AngularJS.

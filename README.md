@@ -859,4 +859,69 @@ Promise.all([sờ_trên, sờ_dưới, sờ_tùm_lum])
     console.log(result)); // ["Phê trên", "Phê dưới", "Phê tùm lum"]
 ```
 
+## Sự bá đạo của ASYNC/ AWAIT trong JavaScript
+### Nhắc lại kiến thức
+JavaScript là ngôn ngữ single-thread, tức là chỉ có một thread duy nhất để thực thi các dòng lệnh. Nếu chạy theo cơ chế đồng bộ (synchonous) thì khi thực hiện tính toán phức tạp, gọi AJAX request tới server, gọi database (trong NodeJS), thread này sẽ dừng để chờ, làm toàn bộ trình duyệt bị ... treo.
 
+Để tránh điều này, hầu hết code gọi AJAX request hoặc database trong JavaScript đều chạy theo cơ chế bất đồng bộ (asynchonous). Ban đầu, việc chạy code asynchonous trong JavaScript được thực hiện nhờ callback (như đoạn code dưới đây)
+```python
+let callback = function(image) => console.log(image);
+ajax.get("HangDeThuong.info", callback);
+
+// Có thể viết gọn như sau
+ajax.get("ThuHangDeThuong.info", (image) => console.log(image));
+```
+Tất nhiên, vì callback có một số nhược điểm như code dài dòng, callback hell,... Nên người ta tạo ra 1 pattern mới gọi là Promise!
+
+### Từ callback, promise đến Async/ Await
+Promise đã giải quyết khá tốt những vấn đề của callback. Code trở nên dễ đọc, tách biệt và dễ bắt lỗi hơn.
+
+  Tuy nhiên, dùng promise đôi khi ta vẫn thấy hơi khó chịu v ì phải truyền callback vào hàm then và catch. Code cũng sẽ hơi dư thừa và khóa debug, vì toàn bộ các hàm then chỉ được tính là 1 câu lệnh nên không debug riêng từng dòng được. => Sự ra đời của async / await.
+  
+  Vậy async/await có gì hay ho? Chúng giúp ta viết code có vẻ đồng bộ (synchonous), nhưng thật ra lại chạy bất đồng bộ (asynchonous).
+  ví dụ: 
+  ```python
+  //--- code javascript
+  function findRandomImgPromise(tag){
+    const apiKey = "a89c66e48519481ab448a3f8356e635c";
+    const endpoint = `https://api.giphy.com/v1/gifs/random?api_key=${apiKey}&tag=${tag}`;
+    return fetch(endpoint)
+      .then(rs => rs.json())
+      .then(data => data.data.fixed_width_small_url);
+  }
+  
+  $("#request").click(async () => {
+    const imgUrl = await findRandomImgPromise('cat');
+    $("#cat").attr("src", imgUrl);
+  });
+  
+  //----- code html
+  <button id="request"> get random animal</button>
+  <br/>
+  <img id="cat"/>
+  <img id="dog"/>
+  <img id="fish"/>
+  ```
+  hàm findRandomImgPromise là hàm bất đồng bộ, trả về một Promise. Với từ khóa _await_, ta có thể coi hàm này là đồng bộ, câu lệnh phía sau chỉ được chay sau khi hàm này trả về kết quả.
+  
+### Tại sao nên dùng async/await
+nó có một số ưu điểm vượt trộ so với promise:
+- Code dễ đọc hơn rất rất nhiều, không cần then rồi catch gì hết, chỉ viết như code chạy tuần tự, sau đó dùng try/catch thông thường để bắt lỗi.
+- Viết vòng lặp qua từng phần tử trở nên vô cùng đơn giản, chỉ việc await trong mỗi vòng lặp.
+- Debug dễ hơn nhiều, vì mỗi lần dùng await được tính là một dòng code, do đó ta có thể đặt debugger để debug từng dòng như bình thường.
+- Khi có lỗi, exception sẽ chỉ ra lỗi ở dòng số máy chứ không chung chung như là un-resolve promise.
+- Với promise hoặc callback, việc kết hợp if/else hoặc retry với code asynchonous là một cực hình vì ta phải viết code lòng vòng, rắc rối. Với async/await, việc này vô dùng dễ dàng.
+get source example here
+https://codepen.io/minh-hi-the-styleful/pen/VJOXyw
+
+### Bất cập của async/await
+Tất nhiên, async/await cũng có một số bất cập mà cần phải lưu ý trước khi sử dụng:
+- Không chạy được trên các trình duyệt cũ. Nếu dự án yêu cầu phải chạy trên các trình duyệt cũ, bàn phải dùng Babel để transpliler code ra ES5 để chạy
+- Khi ta await một promise bị reject, JavaScript sẽ throw một Exception. Do đó, nếu dùng async await mà quên try catch là thi lâu lâu chúng ta sẽ bị... nuốt lỗi hoặc code ngừng chạy. 
+- async await bắt buộc phải đi kèm với nhau! await chỉ dùng đượctrong hàm async, nếu không sẽ bị syntax error. Do đó, async await sẽ lann dần ra toàn bộ các hàm trong code của bạn
+
+### Áp dụng async/await vào code
+Về bản chất, một hàm async sẽ trả ra một promise, tương ứng với Task trong C#. Do vậy, để có thể dùng async await một cách hiệu quả, chúng ta phải nắm rõ cơ chế làm việc của Promise.
+Ngoài ra nếu dùng Nodejs, có thể sử dụng combo Promisify + Async/Await như sau:
+1. Sử dụng Bluebird hoặc util.promisify (node 8 trở lên) để biến các hàm callback của NodeJs thành Promise.
+2. Dùng async/await để lấy kế quả từ các Promise này.
